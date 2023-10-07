@@ -7,7 +7,7 @@ var lon;
 var currentTemp;
 var currentWind;
 var currentIconId;
-
+var currentHumidity;
 var forecastData;
 
 // var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
@@ -61,6 +61,8 @@ function fetchWeatherData() {
         lon = data.coord.lon;
         console.log(lon);
         currentIconId = data.weather[0].icon;
+        currentHumidity = data.main.humidity;
+        currentWind = data.wind.speed;
     }).then(() => {
         var forecastURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
         fetch(forecastURL).then((response) => {
@@ -87,6 +89,18 @@ function renderWeather() {
     currentWeatherIcon.setAttribute("src", "http://openweathermap.org/img/wn/" + currentIconId + "@2x.png")
     document.getElementById("current").appendChild(currentWeatherIcon);
 
+    let currentHumidityEl = document.createElement("p");
+    currentHumidityEl.innerHTML = currentHumidity + " Humidity";
+
+    document.getElementById("current").appendChild(currentHumidityEl);
+
+    let currentWindEl = document.createElement("p");
+    currentWindEl.innerHTML = "Wind speed is " + currentWind;
+
+    document.getElementById("current").appendChild(currentWindEl);
+}
+
+function renderForecasts() {
     let forecastIndexs = [7, 15, 23, 31, 39];
     for (let i = 0; i < forecastIndexs.length; i++) {
         let temp = forecastData.list[forecastIndexs[i]].main.temp;
@@ -97,10 +111,11 @@ function renderWeather() {
         document.getElementById("forecasts").appendChild(totalForecastData);
     }
 }
-
 function clearWeatherData () {
-    let clearData = document.getElementById("current")
-    clearData.textContent = "";
+    let clearCurrentData = document.getElementById("current");
+    clearCurrentData.textContent = "";
+    let clearForecastData = document.getElementById("forecasts");
+    clearForecastData.textContent = "";
 }
 
 var searchText = document.querySelector("#searchText");
@@ -168,6 +183,8 @@ function init() {
     if (searchesList !== null) {
         searches = searchesList;
         showSearchesArrayOnReload(searches);
+    } else {
+        searches = [];
     }
 }
 
