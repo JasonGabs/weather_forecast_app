@@ -10,38 +10,6 @@ var currentIconId;
 var currentHumidity;
 var forecastData;
 
-// var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
-
-// fetch(queryURL).then((response) => {
-//     if (!response.ok) {
-//         console.log("reponse  failed!");
-//     } else {
-//         return response.json();
-//     }
-// }).then((data) => {
-//     console.log(data);
-//     let kelvinTemp = data.main.temp;
-//     currentTemp = Math.floor((kelvinTemp - 273) * 9 / 5 + 32);
-//     console.log(currentTemp);
-//     lat = data.coord.lat;
-//     console.log(lat);
-//     lon = data.coord.lon;
-//     console.log(lon);
-//     currentIconId = data.weather[0].icon;
-// }).then(() => {
-//     var forecastURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
-//     fetch(forecastURL).then((response) => {
-//         if (!response.ok) {
-//             console.log("forecast reponse  failed!");
-//         } else {
-//             return response.json();
-//         }
-//     }).then((data) => {
-//         forecastData = data;
-//         console.log(data);
-//         renderWeather()
-//     })
-// })
 function fetchWeatherData() {
     var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
 
@@ -52,14 +20,10 @@ function fetchWeatherData() {
             return response.json();
         }
     }).then((data) => {
-        console.log(data);
         let kelvinTemp = data.main.temp;
         currentTemp = Math.floor((kelvinTemp - 273) * 9 / 5 + 32);
-        console.log(currentTemp);
         lat = data.coord.lat;
-        console.log(lat);
         lon = data.coord.lon;
-        console.log(lon);
         currentIconId = data.weather[0].icon;
         currentHumidity = data.main.humidity;
         currentWind = data.wind.speed;
@@ -67,22 +31,26 @@ function fetchWeatherData() {
         var forecastURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
         fetch(forecastURL).then((response) => {
             if (!response.ok) {
-                console.log("forecast reponse  failed!");
             } else {
                 return response.json();
             }
         }).then((data) => {
             forecastData = data;
-            console.log(data);
-            renderWeather()
+            
+            renderWeather();
+            renderForecasts();
         })
     })
 }
 
 function renderWeather() {
+
+    let current = document.createElement("p");
+    current.innerHTML = "Current Weather"
+    document.getElementById("current").appendChild(current);
+    
     let currentTempEl = document.createElement("p");
     currentTempEl.innerHTML = currentTemp + " F";
-
     document.getElementById("current").appendChild(currentTempEl);
 
     let currentWeatherIcon = document.createElement("img")
@@ -91,27 +59,45 @@ function renderWeather() {
 
     let currentHumidityEl = document.createElement("p");
     currentHumidityEl.innerHTML = currentHumidity + " Humidity";
-
     document.getElementById("current").appendChild(currentHumidityEl);
 
     let currentWindEl = document.createElement("p");
     currentWindEl.innerHTML = "Wind speed is " + currentWind;
-
     document.getElementById("current").appendChild(currentWindEl);
 }
 
 function renderForecasts() {
+
+    let forecast = document.createElement("p");
+    forecast.innerHTML = "Forecasts"
+    document.getElementById("forecasts").appendChild(forecast);
+
     let forecastIndexs = [7, 15, 23, 31, 39];
     for (let i = 0; i < forecastIndexs.length; i++) {
         let temp = forecastData.list[forecastIndexs[i]].main.temp;
-        console.log(temp);
         let convertedTemp = Math.floor((temp - 273) * 9 / 5 + 32);
+
         let totalForecastData = document.createElement("p");
         totalForecastData.innerHTML = convertedTemp;
         document.getElementById("forecasts").appendChild(totalForecastData);
+
+        let humid = forecastData.list[forecastIndexs[i]].main.humidity
+        let forecastHumidity = document.createElement("p");
+        forecastHumidity.innerHTML = humid + " Humidity";
+        document.getElementById("forecasts").appendChild(forecastHumidity);
+
+        let wind = forecastData.list[forecastIndexs[i]].wind.speed;
+        let forecastWind = document.createElement("p");
+        forecastWind.innerHTML = wind + " Wind Speed";
+
+        let icon = forecastData.list[forecastIndexs[i]].weather[0].icon
+        let currentWeatherIcon = document.createElement("img")
+        currentWeatherIcon.setAttribute("src", "http://openweathermap.org/img/wn/" + icon + "@2x.png")
+        document.getElementById("forecasts").appendChild(currentWeatherIcon);
     }
 }
-function clearWeatherData () {
+
+function clearWeatherData() {
     let clearCurrentData = document.getElementById("current");
     clearCurrentData.textContent = "";
     let clearForecastData = document.getElementById("forecasts");
@@ -141,10 +127,14 @@ searchButton.addEventListener("click", function (event) {
     showHistory();
 })
 
+
+
+
 clearHistory.addEventListener("click", function (event) {
     localStorage.clear();
     searches = [];
     listItems.innerHTML = "";
+    clearWeatherData();
 })
 
 function showHistory() {
@@ -163,6 +153,12 @@ function showSearchesArrayOnReload() {
         listItem.setAttribute("id", i);
         listItem.textContent = element;
         listContainer.appendChild(listItem);
+        listItem.addEventListener("click", function (event) {
+            let element = event.target;
+            clearWeatherData();
+            city = element.textContent;
+            fetchWeatherData();
+        })
     }
 }
 
@@ -171,11 +167,22 @@ function showOneSearchAtATime() {
 
     var listContainer = document.getElementById("listItem");
     var listItem = document.createElement("li");
-
+    var listButton = document.createElement("button");
     listItem.setAttribute("id", 0);
     listItem.textContent = element;
+    listButton.setAttribute("id", 1);
+    listButton.textContent = element;
+    listContainer.appendChild(listButton);
     listContainer.appendChild(listItem);
-
+    
+    for (let i = 0; i < searches.length; i++) {
+        listButton.addEventListener("click", function (event) {
+            let element = event.target;
+            clearWeatherData();
+            city = element.textContent;
+            fetchWeatherData();
+        })
+    }
 }
 
 function init() {
@@ -190,15 +197,3 @@ function init() {
 
 init();
 
-// GIVEN a weather dashboard with form inputs
-// WHEN I search for a city
-// THEN I am presented with current and future conditions for that city and that city is added to the search history
-
-// WHEN I view current weather conditions for that city
-// THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, and the the wind speed
-
-// WHEN I view future weather conditions for that city
-// THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
-
-// WHEN I click on a city in the search history
-// THEN I am again presented with current and future conditions for that city
