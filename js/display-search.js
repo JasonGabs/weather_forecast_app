@@ -1,114 +1,79 @@
-// var resultTextEl = document.querySelector('#result-text');
-// var resultContentEl = document.querySelector('#result-content');
-// var searchFormEl = document.querySelector('#search-form');
+// var searches = [];
+// var searchText = document.querySelector("#searchText");
+// var clearHistory = document.querySelector("#clearHistory");
+// var searchLi = document.querySelector("#li");
+// var listItems = document.querySelector("#listItem");
+// var searchButton = document.querySelector("#searchButton");
 
-// function getParams() {
-//   // Get the search params out of the URL (i.e. `?q=london&format=photo`) and convert it to an array (i.e. ['?q=london', 'format=photo'])
-//   var searchParamsArr = document.location.search.split('&');
+// searchButton.addEventListener("click", function(event) {
+//     event.preventDefault();
+    
+//     searches.push(searchText.value);
+//     searchString = searchText.value;
+//     showOneSearchAtATime();
 
-//   // Get the query and format values
-//   var query = searchParamsArr[0].split('=').pop();
-//   var format = searchParamsArr[1].split('=').pop();
+//     searchText.value = "";
 
-//   searchApi(query, format);
+//     localStorage.setItem("search", JSON.stringify(searches));
+//     showHistory();
+// })
+
+// clearHistory.addEventListener("click", function(event) {
+//     localStorage.clear();
+//     searches = [];
+//     listItems.innerHTML = "";
+// })
+
+// function showHistory() {
+//   if (searchLi) {
+//     searchLi.innerHTML = "";
+//   }  
 // }
 
-// function printResults(resultObj) {
-//   console.log(resultObj);
+// function showSearchesArrayOnReload() {
+//   for (var i = 0; i < searches.length; i++) {
+//     var element = searches[i];
+    
+//     var listContainer = document.getElementById("listItem");
+//     var listItem = document.createElement("button");
 
-//   // set up `<div>` to hold result content
-//   var resultCard = document.createElement('div');
-//   resultCard.classList.add('card', 'bg-light', 'text-dark', 'mb-3', 'p-3');
-
-//   var resultBody = document.createElement('div');
-//   resultBody.classList.add('card-body');
-//   resultCard.append(resultBody);
-
-//   var titleEl = document.createElement('h3');
-//   titleEl.textContent = resultObj.title;
-
-//   var bodyContentEl = document.createElement('p');
-//   bodyContentEl.innerHTML =
-//     '<strong>Date:</strong> ' + resultObj.date + '<br/>';
-
-//   if (resultObj.subject) {
-//     bodyContentEl.innerHTML +=
-//       '<strong>Subjects:</strong> ' + resultObj.subject.join(', ') + '<br/>';
-//   } else {
-//     bodyContentEl.innerHTML +=
-//       '<strong>Subjects:</strong> No subject for this entry.';
+//     listItem.setAttribute("id", i);
+//     listItem.textContent = element;
+//     listContainer.appendChild(listItem);
 //   }
-
-//   if (resultObj.description) {
-//     bodyContentEl.innerHTML +=
-//       '<strong>Description:</strong> ' + resultObj.description[0];
-//   } else {
-//     bodyContentEl.innerHTML +=
-//       '<strong>Description:</strong>  No description for this entry.';
-//   }
-
-//   var linkButtonEl = document.createElement('a');
-//   linkButtonEl.textContent = 'Read More';
-//   linkButtonEl.setAttribute('href', resultObj.url);
-//   linkButtonEl.classList.add('btn', 'btn-dark');
-
-//   resultBody.append(titleEl, bodyContentEl, linkButtonEl);
-
-//   resultContentEl.append(resultCard);
 // }
 
-// function searchApi(query, format) {
-//   var locQueryUrl = 'https://www.loc.gov/search/?fo=json';
+// function showOneSearchAtATime() {
+//     var element = searchString;
 
-//   if (format) {
-//     locQueryUrl = 'https://www.loc.gov/' + format + '/?fo=json';
-//   }
+//     var listContainer = document.getElementById("listItem");
+//     var listItem = document.createElement("li");
 
-//   locQueryUrl = locQueryUrl + '&q=' + query;
+//     listItem.setAttribute("id", 0);
+//     listItem.textContent = element;
+//     listContainer.appendChild(listItem);
 
-//   fetch(locQueryUrl)
-//     .then(function (response) {
-//       if (!response.ok) {
-//         throw response.json();
-//       }
-
-//       return response.json();
-//     })
-//     .then(function (locRes) {
-//       // write query to page so user knows what they are viewing
-//       resultTextEl.textContent = locRes.search.query;
-
-//       console.log(locRes);
-
-//       if (!locRes.results.length) {
-//         console.log('No results found!');
-//         resultContentEl.innerHTML = '<h3>No results found, search again!</h3>';
-//       } else {
-//         resultContentEl.textContent = '';
-//         for (var i = 0; i < locRes.results.length; i++) {
-//           printResults(locRes.results[i]);
-//         }
-//       }
-//     })
-//     .catch(function (error) {
-//       console.error(error);
-//     });
 // }
 
-// function handleSearchFormSubmit(event) {
-//   event.preventDefault();
-
-//   var searchInputVal = document.querySelector('#search-input').value;
-//   var formatInputVal = document.querySelector('#format-input').value;
-
-//   if (!searchInputVal) {
-//     console.error('You need a search input value!');
-//     return;
-//   }
-
-//   searchApi(searchInputVal, formatInputVal);
+// function init () {
+//     var searchesList = JSON.parse(localStorage.getItem("search"));
+//     if (searchesList !== null) {
+//         searches = searchesList;
+//         showSearchesArrayOnReload(searches);
+//     }
 // }
 
-// searchFormEl.addEventListener('submit', handleSearchFormSubmit);
+// init();
 
-// getParams();
+// // GIVEN a weather dashboard with form inputs
+// // WHEN I search for a city
+// // THEN I am presented with current and future conditions for that city and that city is added to the search history
+
+// // WHEN I view current weather conditions for that city
+// // THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, and the the wind speed
+
+// // WHEN I view future weather conditions for that city
+// // THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
+
+// // WHEN I click on a city in the search history
+// // THEN I am again presented with current and future conditions for that city

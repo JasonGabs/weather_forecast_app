@@ -8,3 +8,12 @@ body {
   
 }
 
+#listItem {
+  display: block;
+  color: rgb(12, 133, 180);
+}
+
+div ul button {
+  display: block;
+  margin: 5px;
+}
